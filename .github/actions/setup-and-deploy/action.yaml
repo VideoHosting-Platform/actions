@@ -9,14 +9,6 @@ inputs:
     required: true
   cluster_id:
     required: true
-secrets:
-  dockerhub_username:
-    required: true
-  dockerhub_token:
-    required: true
-  yc_service_account_key:
-    required: true
-
 runs:
   using: "composite"
   steps:
@@ -29,8 +21,8 @@ runs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ inputs.dockerhub_username }}
-        password: ${{ inputs.dockerhub_token }}
+        username: ${{ secrets.dockerhub_username }}
+        password: ${{ secrets.dockerhub_token }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -39,8 +31,8 @@ runs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ inputs.registry }}/{{ inputs.dockerhub_username }}/${{ inputs.image_name }}:latest
-          ${{ inputs.registry }}/{{ inputs.dockerhub_username }}/${{ inputs.image_name }}:${{ github.sha }}
+          ${{ inputs.registry }}/${{ inputs.image_name }}:latest
+          ${{ inputs.registry }}/${{ inputs.image_name }}:${{ github.sha }}
 
     - name: Install yc CLI
       run: |
@@ -50,7 +42,7 @@ runs:
 
     - name: Configure yc CLI
       run: |
-        echo '${{ inputs.yc_service_account_key }}' > key.json
+        echo '${{ secrets.yc_service_account_key }}' > key.json
         if ! jq empty key.json >/dev/null 2>&1; then
           echo "ERROR: Invalid JSON in service account key (details hidden for security)"
           exit 1
