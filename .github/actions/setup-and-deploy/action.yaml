@@ -9,6 +9,7 @@ inputs:
     required: true
   cluster_id:
     required: true
+secrets:
   dockerhub_username:
     required: true
   dockerhub_token:
