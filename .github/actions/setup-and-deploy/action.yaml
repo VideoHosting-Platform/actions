@@ -1,0 +1,73 @@
+name: 'Setup and Deploy'
+description: 'Common setup and deployment steps'
+inputs:
+  registry:
+    required: true
+  image_name:
+    required: true
+  folder_id:
+    required: true
+  cluster_id:
+    required: true
+  dockerhub_username:
+    required: true
+  dockerhub_token:
+    required: true
+  yc_service_account_key:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.dockerhub_username }}
+        password: ${{ inputs.dockerhub_token }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ inputs.registry }}/${{ inputs.image_name }}:latest
+          ${{ inputs.registry }}/${{ inputs.image_name }}:${{ github.sha }}
+
+    - name: Install yc CLI
+      run: |
+        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Configure yc CLI
+      run: |
+        echo '${{ inputs.yc_service_account_key }}' > key.json
+        if ! jq empty key.json >/dev/null 2>&1; then
+          echo "ERROR: Invalid JSON in service account key (details hidden for security)"
+          exit 1
+        else
+          echo "Service account key JSON is valid (content not displayed)"
+        fi
+        yc config set service-account-key key.json
+        yc config set folder-id ${{ inputs.folder_id }}
+      shell: bash
+
+    - name: Setup kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+      shell: bash
+
+    - name: Setup kubectl configs
+      run: |
+        yc managed-kubernetes cluster get-credentials ${{ inputs.cluster_id }} --external
+      shell: bash
