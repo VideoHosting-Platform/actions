@@ -38,8 +38,8 @@ runs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ inputs.registry }}/${{ inputs.image_name }}:latest
-          ${{ inputs.registry }}/${{ inputs.image_name }}:${{ github.sha }}
+          ${{ inputs.registry }}/{{ inputs.dockerhub_username }}/${{ inputs.image_name }}:latest
+          ${{ inputs.registry }}/{{ inputs.dockerhub_username }}/${{ inputs.image_name }}:${{ github.sha }}
 
     - name: Install yc CLI
       run: |
