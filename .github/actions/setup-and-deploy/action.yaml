@@ -74,6 +74,7 @@ runs:
         echo "${{ inputs.gh_token }}" | helm registry login ghcr.io \
             --username redblood-pixel \
             --password-stdin
+      shell: bash
 
     - name: Setup kubectl configs
       run: |
