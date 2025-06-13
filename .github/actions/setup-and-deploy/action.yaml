@@ -72,7 +72,7 @@ runs:
     - name: log in to helm chart
       run: |
         echo "${{ inputs.gh_token }}" | helm registry login ghcr.io \
-            --username ${{ github.actor }} \
+            --username redblood-pixel \
             --password-stdin
 
     - name: Setup kubectl configs
