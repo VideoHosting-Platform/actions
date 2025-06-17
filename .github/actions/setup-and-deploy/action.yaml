@@ -15,8 +15,6 @@ inputs:
     required: true
   yc_service_account_key:
     required: true
-  gh_token:
-    required: true
 
 runs:
   using: "composite"
@@ -68,13 +66,6 @@ runs:
     
     - name: Set up Helm
       uses: azure/setup-helm@v3
-
-    - name: log in to helm chart
-      run: |
-        echo "${{ inputs.gh_token }}" | helm registry login ghcr.io \
-            --username redblood-pixel \
-            --password-stdin
-      shell: bash
 
     - name: Setup kubectl configs
       run: |
