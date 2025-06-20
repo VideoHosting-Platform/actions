@@ -3,8 +3,6 @@ description: 'Common setup and deployment steps'
 inputs:
   registry:
     required: true
-  image_name:
-    required: true
   folder_id:
     required: true
   cluster_id:
