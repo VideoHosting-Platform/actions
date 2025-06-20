@@ -34,8 +34,8 @@ runs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ inputs.registry }}/${{ github.repository_owner }}:latest
-          ${{ inputs.registry }}/${{ github.repository_owner }}:${{ github.sha }}
+          ${{ inputs.registry }}/${{ github.repository }}:latest
+          ${{ inputs.registry }}/${{ github.repository }}:${{ github.sha }}
 
     - name: Install yc CLI
       run: |
